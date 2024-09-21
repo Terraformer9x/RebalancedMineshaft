@@ -1,0 +1,9 @@
+{
+    "name": "RebalancedMineshaft",
+    "version_number": "0.1.0",
+	"website_url": "https://github.com/Terraformer9x/RebalancedMineshaft",
+    "description": "Rebalances the Mineshaft interior to be more akin to how Factory and Mansion are balanced.",
+    "dependencies": [
+		"BepInEx-BepInExPack-5.4.2100"
+	]
+}
