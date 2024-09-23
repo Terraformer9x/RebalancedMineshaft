@@ -24,6 +24,7 @@ public class Plugin : BaseUnityPlugin
         Instance ??= this;
 
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+        RebalancedMineshaftConfig.Bind(base.Config);
 
         harmony.PatchAll(typeof(MineshaftPatch));
     }
@@ -42,19 +43,19 @@ public class MineshaftPatch
         if (__instance.DungeonFlow.name == "Level3Flow")
         {
             Plugin.LogDebug(__instance.DungeonFlow.name + $" detected, changing generation size.");
-            __instance.DungeonFlow.Length.Min = 11;
-            __instance.DungeonFlow.Length.Max = 14;
+            __instance.DungeonFlow.Length.Min = 12;
+            __instance.DungeonFlow.Length.Max = 15;
             __instance.DungeonFlow.Lines[0].Length = 0.35f;
             __instance.DungeonFlow.Lines[1].Position = 0.35f;
             __instance.DungeonFlow.Lines[1].Length = 0.3f;
             __instance.DungeonFlow.Lines[2].Position = 0.65f;
             __instance.DungeonFlow.Lines[2].Length = 0.35f;
-            __instance.DungeonFlow.Lines[0].DungeonArchetypes[0].BranchCount.Min = 9;
+            /*__instance.DungeonFlow.Lines[0].DungeonArchetypes[0].BranchCount.Min = 11;
             __instance.DungeonFlow.Lines[0].DungeonArchetypes[0].BranchCount.Max = 13;
-            __instance.DungeonFlow.Lines[1].DungeonArchetypes[0].BranchCount.Min = 4;
-            __instance.DungeonFlow.Lines[1].DungeonArchetypes[0].BranchCount.Max = 6;
-            //__instance.DungeonFlow.Lines[2].DungeonArchetypes[0].BranchCount.Min = 9;
-            //__instance.DungeonFlow.Lines[2].DungeonArchetypes[0].BranchCount.Max = 13;
+            __instance.DungeonFlow.Lines[1].DungeonArchetypes[0].BranchCount.Min = 9;
+            __instance.DungeonFlow.Lines[1].DungeonArchetypes[0].BranchCount.Max = 11;
+            __instance.DungeonFlow.Lines[2].DungeonArchetypes[0].BranchCount.Min = 11;
+            __instance.DungeonFlow.Lines[2].DungeonArchetypes[0].BranchCount.Max = 13;*/
         }
     }
 
@@ -73,7 +74,7 @@ public class MineshaftPatch
                     if (tempTransform != null)
                     {
                         Plugin.LogDebug($"Converting to random spawn at " + tempTransform.position.x + ", " + tempTransform.position.y + ", " + tempTransform.position.z);
-                        Functions.ConvertToRandomSpawn(tempTransform, 0.15f, 0.25f);
+                        Functions.ConvertToRandomSpawn(tempTransform, 0.3f, 0.5f);
                     }
                     break;
 
@@ -82,7 +83,7 @@ public class MineshaftPatch
                     if (tempTransform != null)
                     {
                         Plugin.LogDebug($"Converting to random spawn at " + tempTransform.position.x + ", " + tempTransform.position.y + ", " + tempTransform.position.z);
-                        Functions.ConvertToRandomSpawn(tempTransform, 0.15f, 0.25f);
+                        Functions.ConvertToRandomSpawn(tempTransform, 0.3f, 0.5f);
                     }
                     break;
             }
@@ -207,7 +208,7 @@ public class MineshaftPatch
         {
             if(enemyType.name == "CaveDweller")
             {
-                enemyType.increasedChanceInterior = -1;
+                enemyType.increasedChanceInterior = RebalancedMineshaftConfig.increasedManeaterChance.Value ? 4 : -1;
                 break;
             }
         }
@@ -225,9 +226,14 @@ public class MineshaftPatch
                 new CodeMatch(OpCodes.Ldc_I4_6)
             )
             .SetInstruction(
-                new CodeInstruction(OpCodes.Ldc_I4_0)
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(MineshaftPatch), "ShouldSpawnAdditionalScrap"))
             );
 
         return codeMatcher.InstructionEnumeration();
+    }
+
+    public static int ShouldSpawnAdditionalScrap()
+    {
+        return RebalancedMineshaftConfig.extraScrapSpawn.Value ? 6 : 0;
     }
 }
