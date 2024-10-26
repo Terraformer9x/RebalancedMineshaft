@@ -5,7 +5,7 @@
         <AssemblyName>RebalancedMineshaft</AssemblyName>
         <AssemblyTitle>RebalancedMineshaft</AssemblyTitle>
         <Description>Rebalances the Mineshaft interior to be more akin to how Factory and Mansion are balanced.</Description>
-        <Version>0.2.0</Version>
+        <Version>0.3.0</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>

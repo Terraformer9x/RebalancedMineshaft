@@ -1,7 +1,7 @@
 ## This mod is WIP!
 
 # Rebalanced Mineshaft
-Rebalances the Mineshaft interior to be more akin to how Factory and Mansion are balanced. This is done by reducing the generation size of the Mineshaft to about half and making the loot more distributed across the interior rather than it being super cave-focused. This mod also adds extra scrap spawn points to the grey tunnel pieces.
+Rebalances the Mineshaft interior to be more akin to how Factory and Mansion are balanced. This is done by reducing the generation size of the Mineshaft to about half and making the loot more distributed across the interior rather than it being super cave-focused. This mod also adds extra scrap spawn points to the grey tunnel pieces and (tries to) fix some of the weird collision issues the water tunnel tile piece has.
 
 The mod also comes with options to toggle the 6 extra scrap spawn for Mineshafts and toggle Maneaters having more commonality on Mineshafts for balancing purposes.
 
