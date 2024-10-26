@@ -24,14 +24,37 @@ public class Plugin : BaseUnityPlugin
         Instance ??= this;
 
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
-        RebalancedMineshaftConfig.Bind(base.Config);
 
+        RebalancedMineshaftConfig.Bind(base.Config);
+        Assets.LoadAssets();
         harmony.PatchAll(typeof(MineshaftPatch));
     }
 
     public static void Log(string msg) => Instance.Logger.LogInfo(msg);
     public static void LogDebug(string msg) => Instance.Logger.LogDebug(msg);
     public static void LogWarning(string msg) => Instance.Logger.LogWarning(msg);
+    public static void LogError(string msg) => Instance.Logger.LogWarning(msg);
+}
+
+internal static class Assets
+{
+    internal static AssetBundle assetBundle;
+    internal static Mesh waterTileCollision;
+
+    internal static void LoadAssets()
+    {
+        try
+        {
+            assetBundle = AssetBundle.LoadFromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "rebalancedmineshaft"));
+            waterTileCollision = assetBundle.LoadAsset<Mesh>("WaterTileCollision");
+            assetBundle.Unload(false);
+        }
+        catch (Exception e) 
+        {
+            Plugin.LogError(e.Message + " - Failed to load mod assets!");
+            return;
+        }
+    }
 }
 
 public class MineshaftPatch
@@ -44,7 +67,7 @@ public class MineshaftPatch
         {
             Plugin.LogDebug(__instance.DungeonFlow.name + $" detected, changing generation size.");
             __instance.DungeonFlow.Length.Min = 12;
-            __instance.DungeonFlow.Length.Max = 15;
+            __instance.DungeonFlow.Length.Max = 14;
             __instance.DungeonFlow.Lines[0].Length = 0.35f;
             __instance.DungeonFlow.Lines[1].Position = 0.35f;
             __instance.DungeonFlow.Lines[1].Length = 0.3f;
@@ -98,10 +121,12 @@ public class MineshaftPatch
 
         foreach (Tile tile in __instance.CurrentDungeon.AllTiles)
         {
+            Transform tempTransform;
+            GameObject tempObject;
             switch (tile.name)
             {
                 case "TunnelSplit(Clone)":
-                    Transform tempTransform = tile.transform.Find("SouthWallProps/Shelf1 (14)")?.transform;
+                    tempTransform = tile.transform.Find("SouthWallProps/Shelf1 (14)")?.transform;
                     if (tempTransform != null)
                     {
                         Plugin.LogDebug($"Found a shelf at " + tempTransform.position.x + ", " + tempTransform.position.y + ", " + tempTransform.position.z);
@@ -134,7 +159,7 @@ public class MineshaftPatch
                     break;
 
                 case "CaveCrampedIntersectTile(Clone)":
-                    GameObject tempObject = tile.transform.Find("TablePropSpawn")?.gameObject;
+                    tempObject = tile.transform.Find("TablePropSpawn")?.gameObject;
                     if (tempObject != null)
                     {
                         Plugin.LogDebug($"Destroying table prop spawn at " + tempObject.transform.position.x + ", " + tempObject.transform.position.y + ", " + tempObject.transform.position.z);
@@ -148,6 +173,12 @@ public class MineshaftPatch
                     {
                         Plugin.LogDebug($"Destroying hazard spawn at " + tempObject.transform.position.x + ", " + tempObject.transform.position.y + ", " + tempObject.transform.position.z);
                         GameObject.Destroy(tempObject);
+                    }
+                    Mesh sharedMesh = tile.transform.Find("WaterTileMesh")?.gameObject.GetComponent<MeshCollider>()?.sharedMesh;
+                    if(sharedMesh != null)
+                    {
+                        Plugin.LogDebug($"Changing collision on water tile at " + tile.transform.position.x + ", " + tile.transform.position.y + ", " + tile.transform.position.z);
+                        sharedMesh = Assets.waterTileCollision;
                     }
                     break;
             };
